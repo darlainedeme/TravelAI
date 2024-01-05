@@ -75,8 +75,7 @@ def page3():
     if "chat_initialized" not in st.session_state:
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
-        st.session_state.messages = [{"role": "system", "content": travel_context}]
-        ask_specific_questions()
+        ask_specific_questions(travel_context)
 
     # Display chatbot messages
     for msg in st.session_state.messages:
@@ -88,9 +87,16 @@ def page3():
         generate_next_question()
 
 # Function to ask specific questions based on the travel context
-def ask_specific_questions():
-    prompt = "Based on the travel plan details provided, please ask specific questions to refine the trip planning."
-    st.session_state.messages.append({"role": "assistant", "content": prompt})
+def ask_specific_questions(travel_context):
+    client = OpenAI(api_key=openai_api_key)
+    context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate a series of specific questions to refine the trip planning."
+    response = client.chat.completions.create(
+        model=get_chatbot_model(),
+        messages=[{"role": "system", "content": context_prompt}]
+    )
+    questions = response.choices[0].message.content
+    st.session_state.messages.append({"role": "assistant", "content": questions})
+
 
 # Function to generate the travel context for the chatbot
 def generate_travel_context():
