@@ -83,30 +83,24 @@ def page3():
     # User input for chatbot
     handle_user_input()
 
-# Function to ask specific questions based on the travel context
-def ask_specific_questions(travel_context):
-    client = OpenAI(api_key=openai_api_key)
+# Function to initialize chatbot with travel context
+def initialize_chat_with_context(travel_context):
     context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate a series of specific questions to refine the trip planning."
-    response = client.chat.completions.create(
-        model=get_chatbot_model(),
-        messages=[{"role": "system", "content": context_prompt}]
-    )
-    questions = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": questions})
+    st.session_state.messages = [{"role": "system", "content": context_prompt}]
+    generate_next_question()
 
+# Function to display chatbot messages
+def display_chatbot_messages():
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
 
-# Function to generate the travel context for the chatbot
-def generate_travel_context():
-    context = "As your travel agent, I need to refine our travel plan. Here's the information I have:\n"
-    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
-    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
-    context += "Participants:\n"
-    for participant in st.session_state['participants']:
-        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
-        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
-    return context
+# Function to handle user input and generate next question
+def handle_user_input():
+    if prompt := st.chat_input():
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        generate_next_question()
 
-# Function to generate the next question after user input
+# Function to generate next question after user input
 def generate_next_question():
     client = OpenAI(api_key=openai_api_key)
     next_question_response = client.chat.completions.create(
@@ -115,21 +109,6 @@ def generate_next_question():
     )
     next_question = next_question_response.choices[0].message.content
     st.session_state.messages.append({"role": "assistant", "content": next_question})
-
-# Helper function to get the correct chatbot model
-def get_chatbot_model():
-    return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
-
-# Function to generate the travel context for the chatbot
-def generate_travel_context():
-    context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
-    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
-    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
-    context += "Participants:\n"
-    for participant in st.session_state['participants']:
-        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
-        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
-    return context
     
 # Page 4: Final Trip Overview
 def page4():
