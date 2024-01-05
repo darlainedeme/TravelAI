@@ -18,6 +18,8 @@ if 'messages' not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
 
 
+openai_api_key = os.getenv('OPENAI_API_KEY')
+
 # Page 1: Initial Setup
 def page1():
     with st.sidebar:
