@@ -15,8 +15,8 @@ if 'selected_countries' not in st.session_state:
 if 'participants' not in st.session_state:
     st.session_state['participants'] = []
 if 'messages' not in st.session_state:
-    st.session_state['messages'] = [{"role": "assistant", "content": "I am your travel agent and will ask you questions to improve your travel plan!"}]
-
+    st.session_state['messages'] = []
+    
 openai_api_key = os.getenv('openai_api_key')
 
 # Page 1: Initial Setup
@@ -69,21 +69,19 @@ def page2():
 # Page 3: Dynamic Chatbot for Travel Planning
 def page3():
     st.title("💬 Dynamic Travel Planning Chatbot")
+    st.caption("🚀 Powered by OpenAI LLM")
 
-    # Initialize chatbot with specific questions based on context
+    # Initialize chatbot with specific context-based questions
     if "chat_initialized" not in st.session_state:
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
-        ask_specific_questions(travel_context)
+        initialize_chat_with_context(travel_context)
 
     # Display chatbot messages
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
+    display_chatbot_messages()
 
     # User input for chatbot
-    if prompt := st.chat_input():
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        generate_next_question()
+    handle_user_input()
 
 # Function to ask specific questions based on the travel context
 def ask_specific_questions(travel_context):
