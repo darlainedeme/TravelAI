@@ -17,7 +17,6 @@ if 'participants' not in st.session_state:
 if 'messages' not in st.session_state:
     st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
 
-
 openai_api_key = os.getenv('openai_api_key')
 
 # Page 1: Initial Setup
@@ -72,12 +71,12 @@ def page3():
     st.title("💬 Dynamic Travel Planning Chatbot")
     st.caption("🚀 Powered by OpenAI LLM")
 
-    # Initialize chatbot with context or continue the conversation
+    # Initialize chatbot with specific questions based on context
     if "chat_initialized" not in st.session_state:
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
-        st.session_state.messages.append({"role": "system", "content": travel_context})
-        ask_initial_question()
+        st.session_state.messages = [{"role": "system", "content": travel_context}]
+        ask_specific_questions()
 
     # Display chatbot messages
     for msg in st.session_state.messages:
@@ -88,73 +87,29 @@ def page3():
         st.session_state.messages.append({"role": "user", "content": prompt})
         generate_next_question()
 
-# Function to generate the travel context for the chatbot
-def generate_travel_context():
-    context = "As your travel agent, I need to refine our travel plan. Here's the information I have:\n"
-    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
-    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
-    context += "Participants:\n"
-    for participant in st.session_state['participants']:
-        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
-        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
-    return context
-
-# Function to ask the initial question based on context
-def ask_initial_question():
-    client = OpenAI(api_key=openai_api_key)
-    initial_question_response = client.chat.completions.create(
-        model=get_chatbot_model(),
-        messages=st.session_state.messages
-    )
-    initial_question = initial_question_response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": initial_question})
-
-# Function to generate the next question after user input
-def generate_next_question():
-    client = OpenAI(api_key=openai_api_key)
-    next_question_response = client.chat.completions.create(
-        model=get_chatbot_model(),
-        messages=st.session_state.messages
-    )
-    next_question = next_question_response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": next_question})
-
-# Helper function to get the correct chatbot model
-def get_chatbot_model():
-    return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
-
-# Function to generate the travel context for the chatbot
-def generate_travel_context():
-    context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
-    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
-    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
-    context += "Participants:\n"
-    for participant in st.session_state['participants']:
-        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
-        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
-    return context
+# Function to ask specific questions based on the travel context
+def ask_specific_questions():
+    prompt = "Based on the travel plan details provided, please ask specific questions to refine the trip planning."
+    st.session_state.messages.append({"role": "assistant", "content": prompt})
 
 # Page 4: Final Trip Overview
 def page4():
     st.title("🌍 Final Trip Overview")
 
-    # Display collected information and chatbot conversation
-    st.subheader("Based on your selections and chatbot interaction, here's the final plan:")
+    # Display the final travel plan
+    st.subheader("Your Customized Travel Plan:")
     
-    # Displaying travel details and participants
-    st.markdown("**Travel Details:**")
-    st.write(f"📅 Dates: {st.session_state['start_date']} to {st.session_state['end_date']}")
-    st.write(f"🌐 Countries: {', '.join(st.session_state['selected_countries'])}")
-    st.write(f"👥 Number of Participants: {st.session_state['num_people']}")
+    # Extracting and displaying the final plan from the chatbot's responses
+    plan = extract_final_plan()
+    st.write(plan)
 
-    st.markdown("**Participants' Details:**")
-    for participant in st.session_state['participants']:
-        st.markdown(f"- {participant['name']}: Age {participant['age']}, Gender: {participant['gender']}, Preferences: {participant['preference']}, Additional notes: {participant['additional_preferences']}")
-
-    # Display chatbot conversation history
-    st.subheader("Chatbot Conversation History:")
+# Function to extract the final plan from the chatbot's responses
+def extract_final_plan():
+    final_plan = ""
     for msg in st.session_state.messages:
-        st.write(f"{msg['role'].capitalize()}: {msg['content']}")
+        if msg["role"] == "assistant":
+            final_plan += msg["content"] + "\n"
+    return final_plan
 
 # Extend the main function
 def main():
