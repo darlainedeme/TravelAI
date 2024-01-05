@@ -83,6 +83,17 @@ def page3():
     # User input for chatbot
     handle_user_input()
 
+# Function to generate the travel context for the chatbot
+def generate_travel_context():
+    context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
+    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
+    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
+    context += "Participants:\n"
+    for participant in st.session_state['participants']:
+        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
+        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
+    return context
+    
 # Function to initialize chatbot with travel context
 def initialize_chat_with_context(travel_context):
     context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate a series of specific questions to refine the trip planning."
