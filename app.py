@@ -67,38 +67,61 @@ def page2():
                 }
                 st.session_state['participants'].append(participant)
 
-# Page 3: Chatbot Conversation as a Travel Agent
+# Page 3: Dynamic Chatbot for Travel Planning
 def page3():
-    st.title("💬 Travel Agent Chatbot")
+    st.title("💬 Dynamic Travel Planning Chatbot")
     st.caption("🚀 Powered by OpenAI LLM")
 
-    # Displaying context from Pages 1 and 2
-    travel_context = generate_travel_context()
-    st.write("Based on your previous inputs, here's the travel context for our conversation:")
-    st.info(travel_context)
+    # Initialize chatbot with context or continue the conversation
+    if "chat_initialized" not in st.session_state:
+        st.session_state.chat_initialized = True
+        travel_context = generate_travel_context()
+        st.session_state.messages.append({"role": "system", "content": travel_context})
+        ask_initial_question()
 
-    # Chatbot messages
+    # Display chatbot messages
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
 
     # User input for chatbot
     if prompt := st.chat_input():
-        if not openai_api_key:
-            st.info("Please add your OpenAI API key to continue.")
-            st.stop()
-
-        # Append the context to the chatbot messages
-        st.session_state.messages.append({"role": "system", "content": travel_context})
         st.session_state.messages.append({"role": "user", "content": prompt})
+        generate_next_question()
 
-        # Select the model based on user choice
-        model = "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
+# Function to generate the travel context for the chatbot
+def generate_travel_context():
+    context = "As your travel agent, I need to refine our travel plan. Here's the information I have:\n"
+    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
+    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
+    context += "Participants:\n"
+    for participant in st.session_state['participants']:
+        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
+        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
+    return context
 
-        client = OpenAI(api_key=openai_api_key)
-        response = client.chat.completions.create(model=model, messages=st.session_state.messages)
-        msg = response.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_message("assistant").write(msg)
+# Function to ask the initial question based on context
+def ask_initial_question():
+    client = OpenAI(api_key=openai_api_key)
+    initial_question_response = client.chat.completions.create(
+        model=get_chatbot_model(),
+        messages=st.session_state.messages
+    )
+    initial_question = initial_question_response.choices[0].message.content
+    st.session_state.messages.append({"role": "assistant", "content": initial_question})
+
+# Function to generate the next question after user input
+def generate_next_question():
+    client = OpenAI(api_key=openai_api_key)
+    next_question_response = client.chat.completions.create(
+        model=get_chatbot_model(),
+        messages=st.session_state.messages
+    )
+    next_question = next_question_response.choices[0].message.content
+    st.session_state.messages.append({"role": "assistant", "content": next_question})
+
+# Helper function to get the correct chatbot model
+def get_chatbot_model():
+    return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
 
 # Function to generate the travel context for the chatbot
 def generate_travel_context():
@@ -111,7 +134,7 @@ def generate_travel_context():
         context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
     return context
 
-# Page 4: Proposed Trip Overview
+# Page 4: Final Trip Overview
 def page4():
     st.title("🌍 Final Trip Overview")
 
@@ -132,19 +155,6 @@ def page4():
     st.subheader("Chatbot Conversation History:")
     for msg in st.session_state.messages:
         st.write(f"{msg['role'].capitalize()}: {msg['content']}")
-
-
-# Function to generate the prompt for the trip overview
-def generate_trip_overview_prompt():
-    prompt = "Create a travel plan for the following group:\n"
-    prompt += f"Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
-    prompt += f"Countries: {', '.join(st.session_state['selected_countries'])}\n"
-    prompt += "Participants:\n"
-    for participant in st.session_state['participants']:
-        prompt += f"- Name: {participant['name']}, Age: {participant['age']}, "
-        prompt += f"Gender: {participant['gender']}, Preferences: {participant['preference']}, "
-        prompt += f"Additional Preferences: {participant['additional_preferences']}\n"
-    return prompt
 
 # Extend the main function
 def main():
