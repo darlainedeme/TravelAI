@@ -83,6 +83,10 @@ def page3():
     # User input for chatbot
     handle_user_input()
 
+# Helper function to get the correct chatbot model
+def get_chatbot_model():
+    return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
+    
 # Function to generate the travel context for the chatbot
 def generate_travel_context():
     context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
