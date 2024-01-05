@@ -9,11 +9,14 @@ def load_countries():
     data = data[data['field_3'].notna()]
     return sorted(data['field_3'].unique().tolist())
 
-# Initialize session state variables
+# Initialize session state variables if they don't exist
 if 'selected_countries' not in st.session_state:
     st.session_state['selected_countries'] = []
 if 'participants' not in st.session_state:
     st.session_state['participants'] = []
+if 'messages' not in st.session_state:
+    st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
+
 
 # Page 1: Initial Setup
 def page1():
