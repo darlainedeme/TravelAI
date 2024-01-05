@@ -14,7 +14,9 @@ if 'selected_countries' not in st.session_state:
     st.session_state['selected_countries'] = []
 if 'participants' not in st.session_state:
     st.session_state['participants'] = []
-    
+if 'messages' not in st.session_state:
+    st.session_state['messages'] = [{"role": "assistant", "content": "I am your travel agent and will ask you questions to improve your travel plan!"}]
+
 openai_api_key = os.getenv('openai_api_key')
 
 # Page 1: Initial Setup
