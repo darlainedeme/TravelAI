@@ -65,11 +65,16 @@ def page2():
                 }
                 st.session_state['participants'].append(participant)
 
-# Page 3: Chatbot Conversation
+# Page 3: Chatbot Conversation as a Travel Agent
 def page3():
-    st.title("💬 Chatbot")
-    st.caption("🚀 A streamlit chatbot powered by OpenAI LLM")
-    
+    st.title("💬 Travel Agent Chatbot")
+    st.caption("🚀 Powered by OpenAI LLM")
+
+    # Displaying context from Pages 1 and 2
+    travel_context = generate_travel_context()
+    st.write("Based on your previous inputs, here's the travel context for our conversation:")
+    st.info(travel_context)
+
     # Chatbot messages
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
@@ -80,53 +85,52 @@ def page3():
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
 
+        # Append the context to the chatbot messages
+        st.session_state.messages.append({"role": "system", "content": travel_context})
+        st.session_state.messages.append({"role": "user", "content": prompt})
+
         # Select the model based on user choice
         model = "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
 
         client = OpenAI(api_key=openai_api_key)
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.chat_message("user").write(prompt)
         response = client.chat.completions.create(model=model, messages=st.session_state.messages)
         msg = response.choices[0].message.content
         st.session_state.messages.append({"role": "assistant", "content": msg})
         st.chat_message("assistant").write(msg)
 
+# Function to generate the travel context for the chatbot
+def generate_travel_context():
+    context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
+    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
+    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
+    context += "Participants:\n"
+    for participant in st.session_state['participants']:
+        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
+        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
+    return context
+
 # Page 4: Proposed Trip Overview
 def page4():
-    st.title("🌍 Proposed Trip Overview")
+    st.title("🌍 Final Trip Overview")
 
-    # Display collected information
-    st.subheader("Travel Details")
+    # Display collected information and chatbot conversation
+    st.subheader("Based on your selections and chatbot interaction, here's the final plan:")
+    
+    # Displaying travel details and participants
+    st.markdown("**Travel Details:**")
     st.write(f"📅 Dates: {st.session_state['start_date']} to {st.session_state['end_date']}")
     st.write(f"🌐 Countries: {', '.join(st.session_state['selected_countries'])}")
     st.write(f"👥 Number of Participants: {st.session_state['num_people']}")
 
-    st.subheader("Participants")
-    for i, participant in enumerate(st.session_state['participants'], 1):
-        st.markdown(f"**Participant {i}:**")
-        st.markdown(f"- Name: {participant['name']}")
-        st.markdown(f"- Age: {participant['age']}")
-        st.markdown(f"- Gender: {participant['gender']}")
-        st.markdown(f"- Preference: {participant['preference']}")
-        st.markdown(f"- Additional Preferences: {participant['additional_preferences']}")
+    st.markdown("**Participants' Details:**")
+    for participant in st.session_state['participants']:
+        st.markdown(f"- {participant['name']}: Age {participant['age']}, Gender: {participant['gender']}, Preferences: {participant['preference']}, Additional notes: {participant['additional_preferences']}")
 
-    # Generate a travel plan using GPT model
-    if st.button("Generate Travel Plan"):
-        if not openai_api_key:
-            st.error("OpenAI API key is missing.")
-            return
-        
-        # Prepare the prompt for the GPT model
-        prompt = generate_trip_overview_prompt()
+    # Display chatbot conversation history
+    st.subheader("Chatbot Conversation History:")
+    for msg in st.session_state.messages:
+        st.write(f"{msg['role'].capitalize()}: {msg['content']}")
 
-        # Make an API call to GPT
-        client = OpenAI(api_key=openai_api_key)
-        model = "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
-        response = client.chat.completions.create(model=model, messages=[{"role": "system", "content": prompt}])
-        trip_plan = response.choices[0].message.content
-
-        st.subheader("Generated Travel Plan")
-        st.write(trip_plan)
 
 # Function to generate the prompt for the trip overview
 def generate_trip_overview_prompt():
