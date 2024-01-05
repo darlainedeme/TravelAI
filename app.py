@@ -14,9 +14,7 @@ if 'selected_countries' not in st.session_state:
     st.session_state['selected_countries'] = []
 if 'participants' not in st.session_state:
     st.session_state['participants'] = []
-if 'messages' not in st.session_state:
-    st.session_state['messages'] = [{"role": "assistant", "content": "How can I help you?"}]
-
+    
 openai_api_key = os.getenv('openai_api_key')
 
 # Page 1: Initial Setup
@@ -69,7 +67,6 @@ def page2():
 # Page 3: Dynamic Chatbot for Travel Planning
 def page3():
     st.title("💬 Dynamic Travel Planning Chatbot")
-    st.caption("🚀 Powered by OpenAI LLM")
 
     # Initialize chatbot with specific questions based on context
     if "chat_initialized" not in st.session_state:
@@ -133,6 +130,7 @@ def generate_travel_context():
         context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
         context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
     return context
+    
 # Page 4: Final Trip Overview
 def page4():
     st.title("🌍 Final Trip Overview")
