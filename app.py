@@ -92,6 +92,41 @@ def ask_specific_questions():
     prompt = "Based on the travel plan details provided, please ask specific questions to refine the trip planning."
     st.session_state.messages.append({"role": "assistant", "content": prompt})
 
+# Function to generate the travel context for the chatbot
+def generate_travel_context():
+    context = "As your travel agent, I need to refine our travel plan. Here's the information I have:\n"
+    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
+    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
+    context += "Participants:\n"
+    for participant in st.session_state['participants']:
+        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
+        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
+    return context
+
+# Function to generate the next question after user input
+def generate_next_question():
+    client = OpenAI(api_key=openai_api_key)
+    next_question_response = client.chat.completions.create(
+        model=get_chatbot_model(),
+        messages=st.session_state.messages
+    )
+    next_question = next_question_response.choices[0].message.content
+    st.session_state.messages.append({"role": "assistant", "content": next_question})
+
+# Helper function to get the correct chatbot model
+def get_chatbot_model():
+    return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
+
+# Function to generate the travel context for the chatbot
+def generate_travel_context():
+    context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
+    context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
+    context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
+    context += "Participants:\n"
+    for participant in st.session_state['participants']:
+        context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
+        context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
+    return context
 # Page 4: Final Trip Overview
 def page4():
     st.title("🌍 Final Trip Overview")
