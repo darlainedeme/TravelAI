@@ -84,7 +84,6 @@ def page3():
     # User input for chatbot
     handle_user_input()
 
-
 # Helper function to get the correct chatbot model
 def get_chatbot_model():
     return "gpt-3.5-turbo" if st.session_state['gpt_version'] == '3.5' else "gpt-4"
@@ -104,7 +103,7 @@ def generate_travel_context():
 def initialize_chat_with_context(travel_context):
     context_prompt = f"You are a travel agent and based on the following travel plan details:\n{travel_context}\nGenerate one question to refine the trip planning until you think you have a good plan to suggest. *You are talking with the traveller(s)"
     st.session_state.messages = [{"role": "system", "content": context_prompt}]
-
+    generate_next_question()
 
 # Function to display chatbot messages
 def display_chatbot_messages():
@@ -126,7 +125,7 @@ def generate_next_question():
     )
     next_question = next_question_response.choices[0].message.content
     st.session_state.messages.append({"role": "assistant", "content": next_question})
-
+    
 def page4():
     st.title("🌍 Final Trip Overview")
 
