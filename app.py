@@ -108,7 +108,7 @@ def generate_travel_context():
     context = "As a travel agent, I need to refine our travel plan. Here's the information I have:\n"
     context += f"Travel Dates: {st.session_state['start_date']} to {st.session_state['end_date']}\n"
     context += f"Destinations: {', '.join(st.session_state['selected_countries'])}\n"
-    context += "Participants:\n"
+    context += "Only participant(s):\n"
     for participant in st.session_state['participants']:
         context += f"- {participant['name']}, {participant['age']} years old, {participant['gender']}, "
         context += f"prefers {participant['preference']}. Additional notes: {participant['additional_preferences']}\n"
