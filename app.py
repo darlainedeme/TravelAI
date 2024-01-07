@@ -3,6 +3,7 @@ from openai import OpenAI
 import geopandas as gpd
 import os
 import datetime
+from streamlit.script_runner import RerunException
 
 # Function to load countries data
 def load_countries():
@@ -68,7 +69,6 @@ def page2():
                 }
                 st.session_state['participants'].append(participant)
 
-# Page 3: Dynamic Chatbot for Travel Planning
 def page3():
     st.title("💬 Dynamic Travel Planning Chatbot")
 
@@ -77,13 +77,14 @@ def page3():
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
         initialize_chat_with_context(travel_context)
-        
+
+    # Handle user input at the beginning
+    if prompt := st.chat_input():
+        handle_user_input(prompt)
+        raise RerunException(st.script_request_queue.RerunData(None))
+
     # Display chatbot messages
     display_chatbot_messages()
-
-
-    # User input for chatbot
-    handle_user_input()
 
 
 # Helper function to get the correct chatbot model
@@ -113,10 +114,9 @@ def display_chatbot_messages():
         st.chat_message(msg["role"]).write(msg["content"])
 
 # Function to handle user input and generate next question
-def handle_user_input():
-    if prompt := st.chat_input():
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        generate_next_question()
+def handle_user_input(prompt):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    generate_next_question()
 
 # Function to generate next question after user input
 def generate_next_question():
