@@ -49,7 +49,7 @@ def page2():
     for i in range(st.session_state['num_people']):
         st.subheader(f"Participant {i+1}")
         with st.form(f"participant_{i}"):
-            name = st.text_input(f"Name of Participant {i+1}")
+            name = st.text_input(f"Name of Participant {i+1}", default="Darlain")
             age = st.number_input(f"Age of Participant {i+1}", min_value=0, max_value=120)
             gender = st.selectbox(f"Gender of Participant {i+1}", ['Male', 'Female', 'Other'])
             preference = st.selectbox(f"Vacation Preference of Participant {i+1}", ['Adventure', 'Relax', 'Culture'])
@@ -99,7 +99,7 @@ def generate_travel_context():
     
 # Function to initialize chatbot with travel context
 def initialize_chat_with_context(travel_context):
-    context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate one question at a time to refine the trip planning until you think you have a good plan to suggest."
+    context_prompt = f"You are a travel agent and based on the following travel plan details:\n{travel_context}\nGenerate one question to refine the trip planning until you think you have a good plan to suggest. *You are talking with the traveller(s)"
     st.session_state.messages = [{"role": "system", "content": context_prompt}]
     generate_next_question()
 
