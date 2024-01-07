@@ -26,9 +26,8 @@ def page1():
         gpt_version = st.radio("Choose GPT Version", ('3.5', '4'))
         
         # Travel Dates
-        start_date = st.date_input("Start Date")
-        st.write(start_date)
-        end_date = st.date_input("End Date")
+        start_date = st.date_input("Start Date",value=2023-12-07)
+        end_date = st.date_input("End Date",value=2024-01-07)
 
         # Country Selection
         countries = load_countries()
