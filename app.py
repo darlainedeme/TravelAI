@@ -32,8 +32,9 @@ def page1():
 
         # Country Selection
         countries = load_countries()
+        st.session_state.selected_countries = ['Thailand','Laos']
         selected_countries = st.multiselect('Choose countries', countries, default=st.session_state.selected_countries)
-        st.session_state.selected_countries = selected_countries
+        #st.session_state.selected_countries = selected_countries
 
         # Number of People
         num_people = st.number_input("Number of People", min_value=1, max_value=100)
