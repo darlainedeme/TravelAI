@@ -77,17 +77,12 @@ def page3():
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
         initialize_chat_with_context(travel_context)
-
+        
     # Display chatbot messages
     display_chatbot_messages()
 
     # User input for chatbot
-    user_input = st.chat_input()
-
-    # Process user input immediately after it's provided
-    if user_input:
-        handle_user_input(user_input)
-
+    handle_user_input()
 
 
 # Helper function to get the correct chatbot model
@@ -117,9 +112,19 @@ def display_chatbot_messages():
         st.chat_message(msg["role"]).write(msg["content"])
 
 # Function to handle user input and generate next question
-def handle_user_input(prompt):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    generate_next_question()
+def handle_user_input():
+    if prompt := st.chat_input():
+        # Append user input to messages and write it immediately
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.chat_message("user").write(prompt)
+
+        # Generate next question (chatbot response)
+        generate_next_question()
+
+        # Write the chatbot response immediately
+        last_message = st.session_state.messages[-1]
+        st.chat_message(last_message["role"]).write(last_message["content"])
+
 
 # Function to generate next question after user input
 def generate_next_question():
