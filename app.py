@@ -28,7 +28,7 @@ def page1():
         
         # Travel Dates
         start_date = st.date_input("Start Date",value=datetime.date(2023, 12, 7))
-        end_date = st.date_input("End Date",value=datetime.date(2024, 01, 7))
+        end_date = st.date_input("End Date",value=datetime.date(2024, 1, 7))
 
         # Country Selection
         countries = load_countries()
