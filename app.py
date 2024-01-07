@@ -3,7 +3,6 @@ from openai import OpenAI
 import geopandas as gpd
 import os
 import datetime
-from streamlit.script_runner import RerunException
 
 # Function to load countries data
 def load_countries():
@@ -78,10 +77,8 @@ def page3():
         travel_context = generate_travel_context()
         initialize_chat_with_context(travel_context)
 
-    # Handle user input at the beginning
-    if prompt := st.chat_input():
-        handle_user_input(prompt)
-        raise RerunException(st.script_request_queue.RerunData(None))
+    # User input for chatbot with callback for handling input
+    st.chat_input(label="Your Message", on_change=handle_user_input, args=(st.session_state,))
 
     # Display chatbot messages
     display_chatbot_messages()
@@ -114,9 +111,13 @@ def display_chatbot_messages():
         st.chat_message(msg["role"]).write(msg["content"])
 
 # Function to handle user input and generate next question
-def handle_user_input(prompt):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    generate_next_question()
+def handle_user_input(session_state):
+    prompt = session_state['chat_input']
+    if prompt:
+        session_state.messages.append({"role": "user", "content": prompt})
+        generate_next_question()
+        # Clear the input box after processing the input
+        session_state['chat_input'] = ''
 
 # Function to generate next question after user input
 def generate_next_question():
