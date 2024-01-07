@@ -102,7 +102,7 @@ def generate_travel_context():
     
 # Function to initialize chatbot with travel context
 def initialize_chat_with_context(travel_context):
-    context_prompt = f"You are a travel agent and based on the following travel plan details:\n{travel_context}\nGenerate one question to refine the trip planning until you think you have a good plan to suggest. You are talking with the traveller(s). Please start from the assumption that they don't know nothing about the countries they are visiting so instead of asking for suggestions about names of places they would like to go, try to propose options for them to choose so that you learn their tastes"
+    context_prompt = f"You are a travel agent and based on the following travel plan details:\n{travel_context}\nGenerate one question to refine the trip planning until you think you have a good plan to suggest. You are talking with the traveller(s). Please start from the assumption that they don't know nothing about the countries they are visiting so instead of asking for suggestions about names of places they would like to go, try to propose options for them to choose so that you learn their tastes. Take into account the total time they said they want they trip to last (you have the info above), and make sure you help them plan the best trip ever."
     st.session_state.messages = [{"role": "system", "content": context_prompt}]
     generate_next_question()
 
