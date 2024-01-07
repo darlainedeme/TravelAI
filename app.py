@@ -2,6 +2,7 @@ import streamlit as st
 from openai import OpenAI
 import geopandas as gpd
 import os
+import datetime
 
 # Function to load countries data
 def load_countries():
@@ -26,8 +27,8 @@ def page1():
         gpt_version = st.radio("Choose GPT Version", ('3.5', '4'))
         
         # Travel Dates
-        start_date = st.date_input("Start Date",value="2023-12-07")
-        end_date = st.date_input("End Date",value="2024-01-07")
+        start_date = st.date_input("Start Date",value=datetime.date(2023, 12, 7))
+        end_date = st.date_input("End Date",value=datetime.date(2024, 01, 7))
 
         # Country Selection
         countries = load_countries()
