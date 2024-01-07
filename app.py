@@ -129,13 +129,8 @@ def generate_next_question():
 def page4():
     st.title("🌍 Final Trip Overview")
 
-    # Display the conversation
-    st.subheader("Conversation Review:")
-    for msg in st.session_state.messages:
-        st.text(f"{msg['role']}: {msg['content']}")
-
     # Button to generate itinerary
-    if st.button("Generate Itinerary"):
+    if st.sidebar.button("Generate Itinerary"):
         itinerary = generate_itinerary_from_conversation(st.session_state.messages)
         st.subheader("Your Customized Travel Plan:")
         st.write(itinerary)
