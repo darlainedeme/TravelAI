@@ -150,7 +150,7 @@ def generate_itinerary_from_conversation(messages):
     prompt = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
     
     # Add additional instructions for the AI if needed
-    prompt += "\n\nBased on the above conversation, generate the best travel itinerary. It has to be a day by day plan, that takes into account feasibility, travel, movements, tastes of the participants, and includes the must see places in the country or countries, the time of the year. You are literally the best travel agent in the world and you need to design the best possible trip for your customers"
+    prompt += "\n\nBased on the above conversation, generate the best travel itinerary. Take into account that this conversation is not meant to include everything that should be in the plan. It helps you understanding the tastes of the travellers. Use it as a reference but then propose them the plan you think would be best, based on available time and optimizing logistics etc. It has to be a day by day plan, that takes into account feasibility, travel, movements, tastes of the participants, and includes the must see places in the country or countries, the time of the year. You are literally the best travel agent in the world and you need to design the best possible trip for your customers"
 
     # Send the prompt to OpenAI API
     client = OpenAI(api_key=openai_api_key)
