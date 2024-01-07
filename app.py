@@ -126,24 +126,34 @@ def generate_next_question():
     next_question = next_question_response.choices[0].message.content
     st.session_state.messages.append({"role": "assistant", "content": next_question})
     
-# Page 4: Final Trip Overview
 def page4():
     st.title("🌍 Final Trip Overview")
 
-    # Display the final travel plan
-    st.subheader("Your Customized Travel Plan:")
-    
-    # Extracting and displaying the final plan from the chatbot's responses
-    plan = extract_final_plan()
-    st.write(plan)
-
-# Function to extract the final plan from the chatbot's responses
-def extract_final_plan():
-    final_plan = ""
+    # Display the conversation
+    st.subheader("Conversation Review:")
     for msg in st.session_state.messages:
-        if msg["role"] == "assistant":
-            final_plan += msg["content"] + "\n"
-    return final_plan
+        st.text(f"{msg['role']}: {msg['content']}")
+
+    # Button to generate itinerary
+    if st.button("Generate Itinerary"):
+        itinerary = generate_itinerary_from_conversation(st.session_state.messages)
+        st.subheader("Your Customized Travel Plan:")
+        st.write(itinerary)
+
+def generate_itinerary_from_conversation(messages):
+    # Format the conversation into a prompt
+    prompt = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+    
+    # Add additional instructions for the AI if needed
+    prompt += "\n\nBased on the above conversation, generate the best travel itinerary."
+
+    # Send the prompt to OpenAI API
+    client = OpenAI(api_key=openai_api_key)
+    response = client.chat.completions.create(
+        model=get_chatbot_model(),
+        messages=[{"role": "system", "content": prompt}]
+    )
+    return response.choices[0].message.content
 
 # Extend the main function
 def main():
