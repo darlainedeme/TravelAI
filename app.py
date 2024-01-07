@@ -26,8 +26,8 @@ def page1():
         gpt_version = st.radio("Choose GPT Version", ('3.5', '4'))
         
         # Travel Dates
-        start_date = st.date_input("Start Date")
-        end_date = st.date_input("End Date")
+        start_date = st.date_input("Start Date",value="01-12-2023")
+        end_date = st.date_input("End Date",value="10-01-2024")
 
         # Country Selection
         countries = load_countries()
@@ -50,10 +50,10 @@ def page2():
         st.subheader(f"Participant {i+1}")
         with st.form(f"participant_{i}"):
             name = st.text_input(f"Name of Participant {i+1}", value="Darlain")
-            age = st.number_input(f"Age of Participant {i+1}", min_value=0, max_value=120)
+            age = st.number_input(f"Age of Participant {i+1}", min_value=0, max_value=120,value=30)
             gender = st.selectbox(f"Gender of Participant {i+1}", ['Male', 'Female', 'Other'])
             preference = st.selectbox(f"Vacation Preference of Participant {i+1}", ['Adventure', 'Relax', 'Culture'])
-            additional_preferences = st.text_area("Additional Preferences")
+            additional_preferences = st.text_area("Additional Preferences",value="I like to discover new cultures")
             submitted = st.form_submit_button("Save Participant")
 
             if submitted:
