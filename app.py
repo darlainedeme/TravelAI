@@ -49,7 +49,7 @@ def page2():
     for i in range(st.session_state['num_people']):
         st.subheader(f"Participant {i+1}")
         with st.form(f"participant_{i}"):
-            name = st.text_input(f"Name of Participant {i+1}", default="Darlain")
+            name = st.text_input(f"Name of Participant {i+1}", value="Darlain")
             age = st.number_input(f"Age of Participant {i+1}", min_value=0, max_value=120)
             gender = st.selectbox(f"Gender of Participant {i+1}", ['Male', 'Female', 'Other'])
             preference = st.selectbox(f"Vacation Preference of Participant {i+1}", ['Adventure', 'Relax', 'Culture'])
