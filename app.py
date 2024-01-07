@@ -76,27 +76,14 @@ def page3():
     if "chat_initialized" not in st.session_state:
         st.session_state.chat_initialized = True
         travel_context = generate_travel_context()
-        st.session_state.messages = [{"role": "system", "content": travel_context}]
-        generate_next_question()  # Start with a question from the chatbot
-
-    # Display chatbot messages
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
-
-    # User input for chatbot and immediate response generation
-    if prompt := st.chat_input():
-        # Append user's message to the conversation
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        initialize_chat_with_context(travel_context)
         
-        # Generate and display the chatbot's response
-        client = OpenAI(api_key=openai_api_key)
-        response = client.chat.completions.create(
-            model=get_chatbot_model(),
-            messages=st.session_state.messages
-        )
-        msg = response.choices[0].message.content
-        st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_message("assistant").write(msg)
+    # Display chatbot messages
+    display_chatbot_messages()
+
+
+    # User input for chatbot
+    handle_user_input()
 
 
 # Helper function to get the correct chatbot model
