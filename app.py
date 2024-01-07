@@ -69,7 +69,6 @@ def page2():
 # Page 3: Dynamic Chatbot for Travel Planning
 def page3():
     st.title("💬 Dynamic Travel Planning Chatbot")
-    st.caption("🚀 Powered by OpenAI LLM")
 
     # Initialize chatbot with specific context-based questions
     if "chat_initialized" not in st.session_state:
@@ -100,7 +99,7 @@ def generate_travel_context():
     
 # Function to initialize chatbot with travel context
 def initialize_chat_with_context(travel_context):
-    context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate a series of specific questions to refine the trip planning."
+    context_prompt = f"Based on the following travel plan details:\n{travel_context}\nGenerate one question at a time to refine the trip planning until you think you have a good plan to suggest."
     st.session_state.messages = [{"role": "system", "content": context_prompt}]
     generate_next_question()
 
