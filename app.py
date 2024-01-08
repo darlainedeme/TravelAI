@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 from docx import Document
 import io
 import os
@@ -162,6 +162,7 @@ def generate_itinerary_from_conversation(messages):
     return response.choices[0].message.content
 
 # Function to interact with OpenAI API for travel guide generation
+import openai
 def openai_api_call_for_travel_guide(prompt):
     openai.api_key = os.getenv('openai_api_key')
     try:
