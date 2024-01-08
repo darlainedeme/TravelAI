@@ -192,23 +192,30 @@ def create_word_document_for_travel_guide(toc, chapters):
         doc.add_paragraph(chapters[i])
     return doc
     
-# Page 5: Personalized Travel Guide Generator
+# Page 5: Personalized Travel Guide Generator Using Data from Previous Pages
 def page5():
     st.title("📘 Personalized Travel Guide Generator")
-    
-    # Collect travel information from user
-    travel_details = st.text_area("Enter your travel details:", "Number of travelers, destination, dates, interests")
 
-    if st.button('Generate Guide'):
-        toc = generate_toc_for_travel_guide(travel_details)
-        chapters = [generate_chapter_content_for_travel_guide(title) for title in toc]
-        document = create_word_document_for_travel_guide(toc, chapters)
+    # Check if required data is available
+    if 'selected_countries' in st.session_state and 'participants' in st.session_state:
+        travel_details = f"Countries: {', '.join(st.session_state['selected_countries'])}. "
+        travel_details += f"Travelers: {len(st.session_state['participants'])} - "
+        for p in st.session_state['participants']:
+            travel_details += f"{p['name']} ({p['age']} years old, {p['gender']}, {p['preference']}). "
+        
+        # Use this information to generate the guide
+        if st.button('Generate Guide'):
+            toc = generate_toc_for_travel_guide(travel_details)
+            chapters = [generate_chapter_content_for_travel_guide(title) for title in toc]
+            document = create_word_document_for_travel_guide(toc, chapters)
 
-        # Saving document to a byte stream for download
-        doc_stream = io.BytesIO()
-        document.save(doc_stream)
-        doc_stream.seek(0)
-        st.download_button("Download Travel Guide", data=doc_stream, file_name="personalized_travel_guide.docx")
+            # Saving document to a byte stream for download
+            doc_stream = io.BytesIO()
+            document.save(doc_stream)
+            doc_stream.seek(0)
+            st.download_button("Download Travel Guide", data=doc_stream, file_name="personalized_travel_guide.docx")
+    else:
+        st.write("Please complete the previous steps to generate your travel guide.")
 
 # Extend the main function to include page 5
 def main():
