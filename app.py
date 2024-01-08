@@ -170,14 +170,14 @@ def openai_api_call_for_travel_guide(prompt, selected_model):
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ]
-        response = client.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=messages,
             max_tokens=1000
         )
         return response['choices'][0]['message']['content']
     else:
-        response = client.completions.create(
+        response = client.chat.completions.create(
             model=selected_model,
             prompt=prompt,
             max_tokens=1000
