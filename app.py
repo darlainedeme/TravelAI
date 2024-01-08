@@ -1,8 +1,10 @@
 import streamlit as st
-from openai import OpenAI
-import geopandas as gpd
+import openai
+from docx import Document
+import io
 import os
 import datetime
+import geopandas as gpd
 
 # Function to load countries data
 def load_countries():
@@ -159,10 +161,59 @@ def generate_itinerary_from_conversation(messages):
     )
     return response.choices[0].message.content
 
-# Extend the main function
+# Function to interact with OpenAI API for travel guide generation
+def openai_api_call_for_travel_guide(prompt):
+    openai.api_key = os.getenv('openai_api_key')
+    try:
+        response = openai.Completion.create(
+          engine="text-davinci-003",
+          prompt=prompt,
+          max_tokens=100
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        return str(e)
+
+# Function to generate table of contents for travel guide
+def generate_toc_for_travel_guide(travel_details):
+    prompt = f"Create a table of contents for a travel guide based on the following details: {travel_details}"
+    return openai_api_call_for_travel_guide(prompt).split('\n')
+
+# Function to generate chapter content
+def generate_chapter_content_for_travel_guide(chapter_title):
+    prompt = f"Write a chapter about '{chapter_title}' for a travel guide."
+    return openai_api_call_for_travel_guide(prompt)
+
+# Function to create Word document for travel guide
+def create_word_document_for_travel_guide(toc, chapters):
+    doc = Document()
+    for i, title in enumerate(toc):
+        doc.add_heading(title, level=1)
+        doc.add_paragraph(chapters[i])
+    return doc
+    
+# Page 5: Personalized Travel Guide Generator
+def page5():
+    st.title("📘 Personalized Travel Guide Generator")
+    
+    # Collect travel information from user
+    travel_details = st.text_area("Enter your travel details:", "Number of travelers, destination, dates, interests")
+
+    if st.button('Generate Guide'):
+        toc = generate_toc_for_travel_guide(travel_details)
+        chapters = [generate_chapter_content_for_travel_guide(title) for title in toc]
+        document = create_word_document_for_travel_guide(toc, chapters)
+
+        # Saving document to a byte stream for download
+        doc_stream = io.BytesIO()
+        document.save(doc_stream)
+        doc_stream.seek(0)
+        st.download_button("Download Travel Guide", data=doc_stream, file_name="personalized_travel_guide.docx")
+
+# Extend the main function to include page 5
 def main():
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ('Page 1', 'Page 2', 'Page 3', 'Page 4'))
+    page = st.sidebar.radio("Go to", ('Page 1', 'Page 2', 'Page 3', 'Page 4', 'Page 5'))
 
     if page == 'Page 1':
         page1()
@@ -172,6 +223,8 @@ def main():
         page3()
     elif page == 'Page 4':
         page4()
+    elif page == 'Page 5':
+        page5()
 
 if __name__ == "__main__":
     main()
