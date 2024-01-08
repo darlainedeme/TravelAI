@@ -163,6 +163,7 @@ def generate_itinerary_from_conversation(messages):
 
 # Function to generate content using GPT-4
 def generate_content_with_gpt4(assistant_prompt, user_prompt):
+    client = OpenAI(api_key=openai_api_key)
     messages = [
         {"role": "assistant", "content": assistant_prompt},
         {"role": "user", "content": user_prompt}
