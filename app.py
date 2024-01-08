@@ -163,17 +163,25 @@ def generate_itinerary_from_conversation(messages):
 
 # Function to interact with OpenAI API for travel guide generation
 import openai
-def openai_api_call_for_travel_guide(prompt):
-    openai.api_key = os.getenv('openai_api_key')
-    try:
+def openai_api_call_for_travel_guide(prompt, selected_model):
+    if selected_model == "gpt-4":
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages,
+            max_tokens=1000
+        )
+        return response['choices'][0]['message']['content']
+    else:
         response = openai.Completion.create(
-          engine="text-davinci-003",
-          prompt=prompt,
-          max_tokens=100
+            model=selected_model,
+            prompt=prompt,
+            max_tokens=1000
         )
         return response.choices[0].text.strip()
-    except Exception as e:
-        return str(e)
 
 # Function to generate table of contents for travel guide
 def generate_toc_for_travel_guide(travel_details):
@@ -204,10 +212,19 @@ def page5():
         for p in st.session_state['participants']:
             travel_details += f"{p['name']} ({p['age']} years old, {p['gender']}, {p['preference']}). "
         
+        selected_model = st.session_state.get('gpt_version', 'gpt-4')
+
         # Use this information to generate the guide
         if st.button('Generate Guide'):
-            toc = generate_toc_for_travel_guide(travel_details)
-            chapters = [generate_chapter_content_for_travel_guide(title) for title in toc]
+            toc_prompt = f"Create a table of contents for a travel guide based on the following details: {travel_details}"
+            toc = openai_api_call_for_travel_guide(toc_prompt, selected_model).split('\n')
+            
+            chapters = []
+            for title in toc:
+                chapter_prompt = f"Write a chapter about '{title}' for a travel guide."
+                chapter_content = openai_api_call_for_travel_guide(chapter_prompt, selected_model)
+                chapters.append(chapter_content)
+
             document = create_word_document_for_travel_guide(toc, chapters)
 
             # Saving document to a byte stream for download
@@ -217,7 +234,6 @@ def page5():
             st.download_button("Download Travel Guide", data=doc_stream, file_name="personalized_travel_guide.docx")
     else:
         st.write("Please complete the previous steps to generate your travel guide.")
-
 # Extend the main function to include page 5
 def main():
     st.sidebar.title("Navigation")
