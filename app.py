@@ -164,19 +164,20 @@ def generate_itinerary_from_conversation(messages):
 # Function to interact with OpenAI API for travel guide generation
 import openai
 def openai_api_call_for_travel_guide(prompt, selected_model):
+    client = OpenAI(api_key=openai_api_key)
     if selected_model == "gpt-4":
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ]
-        response = openai.completions.create(
+        response = client.completions.create(
             model="gpt-4",
             messages=messages,
             max_tokens=1000
         )
         return response['choices'][0]['message']['content']
     else:
-        response = openai.completions.create(
+        response = client.completions.create(
             model=selected_model,
             prompt=prompt,
             max_tokens=1000
