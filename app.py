@@ -161,12 +161,6 @@ def generate_itinerary_from_conversation(messages):
     )
     return response.choices[0].message.content
 
-# Function to interact with OpenAI API for travel guide generation
-import openai
-# Initialize OpenAI client
-openai.api_key = os.getenv('openai_api_key')
-client = openai.OpenAI()
-
 # Function to generate content using GPT-4
 def generate_content_with_gpt4(assistant_prompt, user_prompt):
     messages = [
