@@ -2,4 +2,4 @@ streamlit
 openai
 geopandas
 pandas
-docx
+python-docx
